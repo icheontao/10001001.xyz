@@ -1,0 +1,30 @@
+name: GitHub Page Deploy
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-18.04
+    steps:
+    
+      - name: Checkout main branch
+        uses: actions/checkout@v2
+        
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.83.1'
+          # extended: true
+
+      - name: Build Hugo
+        run: hugo --minify
+
+      - name: Deploy Hugo
+        uses: peaceiris/actions-gh-pages@v3
+        env:
+          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          PUBLISH_BRANCH: blog
+          PUBLISH_DIR: ./public
+          cname: 10001001.xyz
