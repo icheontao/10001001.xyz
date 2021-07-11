@@ -5,7 +5,7 @@ draft: false
 meta: false
 ---
 
-![test]("/images/test.jpg")
+![test](/images/test.jpg)
 ### about me
 
 ...
