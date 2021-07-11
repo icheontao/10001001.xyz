@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo -e "Deploying gitHub pages..."
 git add .
-git commit -m "Built automatically at `data`"
-
+# commit message
+msg="Commit automatically at `date`"
+git commit -m "$msg"
 git push
