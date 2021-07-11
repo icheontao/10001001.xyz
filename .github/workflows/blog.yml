@@ -31,3 +31,4 @@ jobs:
           publish_branch: blog
           publish_dir: ./public
           cname: 10001001.xyz
+          commit_message: ${{ github.event.head_commit.message }}

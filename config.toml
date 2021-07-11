@@ -22,7 +22,7 @@ defaultContentLanguageInSubdir = false
 pluralizeListTitles = false
 
 # 摘要的字数限制
-summaryLength = 32
+summaryLength = 42
 
 # 是否开启 GitHub 风格的 Emoji 书写方式
 enableEmoji = true
@@ -185,37 +185,6 @@ uglyURLs = false
 
 [menu]
     ## 菜单栏
-    # [[menu.main]]
-    #     url = "/"
-    #     name = "首页"
-    #     weight = 1
-    #     pre = "internal"
-    #     post = "home"
-    # [[menu.main]]
-    #     url = "/posts/"
-    #     name = "文章"
-    #     weight = 2
-    #     pre = "internal"
-    #     post = "archive"
-    # [[menu.main]]
-    #     url = "/categories/"
-    #     name = "分类"
-    #     weight = 3
-    #     pre = "internal"
-    #     post = "th"
-    [[menu.main]]
-        url = "/tags/"
-        name = "标签"
-        weight = 4
-        pre = "internal"
-        post = "tags"
-    [[menu.main]]
-        url = "/programming/"
-        name = "编程"
-        weight = 2
-        pre = "internal"
-        post = "program"
-        identifier = "technology"
     [[menu.main]]
         url = "/life/"
         name = "生活"
@@ -224,12 +193,25 @@ uglyURLs = false
         post = "life"
         identifier = "life"
     [[menu.main]]
+        url = "/programming/"
+        name = "编程"
+        weight = 2
+        pre = "internal"
+        post = "program"
+        identifier = "technology"
+    [[menu.main]]
         url = "/book/"
         name = "读书"
         weight = 3
         pre = "internal"
         post = "book"
         identifier = "book"
+    [[menu.main]]
+        url = "/tags/"
+        name = "标签"
+        weight = 4
+        pre = "internal"
+        post = "tags"
     [[menu.main]]
         url = "/about/"
         name = "关于"
@@ -266,8 +248,6 @@ uglyURLs = false
     # 说明：对弹性布局的顶栏无效
 
     # 背景
-    # headerBackground = "linear-gradient(90deg, #f795331a 0, #f370551a 15%, #ef4e7b1a 30%, #a166ab1a 44%, #5073b81a 58%, #1098ad1a 72%, #07b39b1a 86%, #6dba821a 100%)"
-    # headerBackground = "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)"
     headerBackground = "linear-gradient(180deg, #d5d4d0 0%, #d5d4d0 1%, #eeeeec 31%, #efeeec 75%, #e9e9e7 100%);"
     # 说明：https://developer.mozilla.org/zh-CN/docs/Web/CSS/background
 
@@ -351,7 +331,7 @@ uglyURLs = false
     # 站点信息
 
     # 站点的 LOGO
-    siteLogo = "/icons/apple-touch-icon.png"
+    siteLogo = "/icons/site-icon.png"
     # 说明：用于 JSON-LD、Open Graph
 
     # 站点的描述
@@ -760,7 +740,6 @@ uglyURLs = false
     #      首页布局有效
 
     # 日期格式
-    # postMetaDateFormat = "2006.1.2"
 	postMetaDateFormat = "2006-01-02"
     # 注意：请遵循格式 https://gohugo.io/functions/format/
 
@@ -881,10 +860,10 @@ uglyURLs = false
     #      (~/blog/static/images/meme.jpg)
 
     # 是否开启
-    enableImageHost = false
+    enableImageHost = true
 
     # 图片外链地址
-    imageHostURL = "https://example.com/"
+    imageHostURL = "https://10001001.xyz/"
 
     # 是否将 HTML 的头部元数据中的图片链接也替换为外链
     headAlso = false
@@ -954,14 +933,13 @@ uglyURLs = false
     # 文章目录
     fontFamilyTOC = ""
     # 说明文字
-    fontFamilyCaption = "'Zhi Mang Xing', cursive"
+    fontFamilyCaption = ""
     # 页脚
     fontFamilyFooter = ""
     # 主体
     fontFamilyBody = "'EB Garamond', 'Noto Serif SC', serif"
 
     # 网络字体链接
-    # fontsLink = "https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Noto+Serif+SC:wght@400;500;700&family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
     fontsLink = "https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Noto+Serif+SC:wght@400;500;700&family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&family=Zhi+Mang+Xing&display=swap"
     # 说明：要想读者一定体验到你设置的字体，最好
     #      采用网络字体。MemE 主题目前仅支持
@@ -1032,7 +1010,7 @@ uglyURLs = false
     ## 大型小写（英文）
 
     # 是否开启（全局设置）
-    enableSmallCaps = true
+    enableSmallCaps = false
     # 说明：只会应用到分节标题和目录标题
     #      文章的 Front Matter 中的 `smallCaps`
     #      的优先级高于此处
@@ -1086,7 +1064,7 @@ uglyURLs = false
     # 文章的 Git 版本信息
 
     # 是否开启
-    enablePostGitInfo = false
+    enablePostGitInfo = true
 
     # 是否显示（全局设置）
     displayPostGitInfo = false
@@ -1094,7 +1072,7 @@ uglyURLs = false
     #      的优先级高于此处
 
     # 仓库地址
-    repoURL = ""
+    repoURL = "https://github.com/icheontao/10001001.xyz.git"
     # 编辑地址
     repoEditURL = ""
 
@@ -1313,8 +1291,7 @@ uglyURLs = false
     # 说明：仅对 MemE 生成的 CSS 和 JS 有效
 
     # 是否开启文件指纹
-    enableFingerprint = true
-
+    enableFingerprint = false
     # 是否开启子资源完整性验证
     enableSRI = false
     # 说明：开启子资源完整性验证后，该策略将使
