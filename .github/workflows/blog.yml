@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v2
@@ -26,8 +26,8 @@ jobs:
 
       - name: Deploy Hugo
         uses: peaceiris/actions-gh-pages@v3
-        env:
-          deploy_key: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           publish_branch: blog
           publish_dir: ./public
           cname: 10001001.xyz
