@@ -1,9 +1,9 @@
 name: GitHub Page Deploy
 
 on:
-  push:
-  schedule:
-    - cron: '0 23 * * *'
+  push: 
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -31,4 +31,5 @@ jobs:
           publish_branch: blog
           publish_dir: ./public
           cname: 10001001.xyz
-          full_commit_message: ${{ github.event.head_commit.message }}
+          commit_message: ${{ github.event.head_commit.message }}
+          tz: Asia/Shanghai

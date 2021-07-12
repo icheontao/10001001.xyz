@@ -6,13 +6,13 @@ title = "Icheon Tao's Blog"
 languageCode = "zh-CN"
 hasCJKLanguage = true
 # 版权信息（支持 Markdown）
-copyright = "本文在保留作者及链接的前提下，非商业用途随意转载分享。许可协议条款见 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)"
+copyright = "本文在保留作者及链接的前提下，非商业用途随意转载分享。"
 
 # 主题选择
 theme = "meme"
 
 # `hugo new` 新建文章自动打开的文本编辑器
-newContentEditor = "vim"
+newContentEditor = ""
 
 # i18n
 defaultContentLanguage = "zh"
@@ -22,7 +22,7 @@ defaultContentLanguageInSubdir = false
 pluralizeListTitles = false
 
 # 摘要的字数限制
-summaryLength = 42
+summaryLength = 80
 
 # 是否开启 GitHub 风格的 Emoji 书写方式
 enableEmoji = true
@@ -31,7 +31,7 @@ enableEmoji = true
 footnoteReturnLinkContents = "↩"
 
 # 是否启用 Git 版本信息
-enableGitInfo = false
+enableGitInfo = true
 
 # 是否生成 robots.txt 文件
 enableRobotsTXT = false
@@ -219,13 +219,13 @@ uglyURLs = false
     [[menu.main]]
         weight = 6
         identifier = "theme-switcher"
-    [[menu.main]]
-        weight = 7
-        identifier = "lang-switcher"
-    [[menu.main]]
-        weight = 8
-        identifier = "search"
-        post = "search"
+    # [[menu.main]]
+    #     weight = 7
+    #     identifier = "lang-switcher"
+    # [[menu.main]]
+    #     weight = 8
+    #     identifier = "search"
+    #     post = "search"
 
 ##########################################
 # 主题配置
@@ -1070,9 +1070,9 @@ uglyURLs = false
     #      的优先级高于此处
 
     # 仓库地址
-    repoURL = "https://github.com/icheontao/10001001.xyz.git"
+    repoURL = "https://github.com/icheontao/10001001.xyz"
     # 编辑地址
-    repoEditURL = ""
+    repoEditURL = "https://github.com/icheontao/10001001.xyz/blob/main"
 
     # Git 的图标
     gitIcon = "code-branch"
@@ -1221,7 +1221,7 @@ uglyURLs = false
     displaySiteCreatedYear = true
 
     # 年份与作者之间的图标，留空（""）则无
-    iconBetweenYearAndAuthor = "heart"
+    iconBetweenYearAndAuthor = ""
     # 图标颜色
     iconColor = "#f06292"
     # 是否开启图标的跳动效果
