@@ -122,6 +122,7 @@ git remote add origin https://github.com/icheontao/10001001.xyz.git # 此处为�
 git push -u origin main
 ```
 打开仓库地址，点击`Actions`，查看构建结果。
+![Github Actions构建结果](imags/github_actions.png)
 
 ## 配置Github Pages
 登录到你的站点Github下，点击 `Setttings` -> `Pages`进行对应的设置，如下：(标红处是需要注意的地方)
