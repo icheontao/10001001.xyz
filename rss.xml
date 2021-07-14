@@ -1,1 +1,239 @@
-<?xml version="1.0" encoding="utf-8"?><rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Icheon Tao's Blog</title><link>https://10001001.xyz/</link><description>Tao's Blog. 记录个人生活和技术.</description><generator>Hugo 0.83.1 https://gohugo.io/</generator><language>zh-CN</language><managingEditor>icheontao@gmail.com (Icheon Tao)</managingEditor><webMaster>icheontao@gmail.com (Icheon Tao)</webMaster><copyright>本文在保留作者及链接的前提下，非商业用途随意转载分享。</copyright><lastBuildDate>Mon, 12 Jul 2021 09:59:12 +0000</lastBuildDate><atom:link rel="self" type="application/rss+xml" href="https://10001001.xyz/rss.xml"/></channel></rss>
+<?xml version="1.0" encoding="utf-8"?><rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Icheon Tao's Blog</title><link>https://10001001.xyz/</link><description>Tao's Blog. 记录个人生活和技术.</description><generator>Hugo 0.85.0 https://gohugo.io/</generator><language>zh-CN</language><managingEditor>icheontao@gmail.com (Icheon Tao)</managingEditor><webMaster>icheontao@gmail.com (Icheon Tao)</webMaster><copyright>本文在保留作者及链接的前提下，非商业用途随意转载分享。</copyright><lastBuildDate>Wed, 14 Jul 2021 12:37:06 +0000</lastBuildDate><atom:link rel="self" type="application/rss+xml" href="https://10001001.xyz/rss.xml"/><item><title>使用Github Actions自动构建Hugo个人博客</title><link>https://10001001.xyz/programming/use-github-actions-building-hugo-blog/</link><guid isPermaLink="true">https://10001001.xyz/programming/use-github-actions-building-hugo-blog/</guid><pubDate>Wed, 14 Jul 2021 20:07:57 +0800</pubDate><author>icheontao@gmail.com (Icheon Tao)</author><copyright>本文在保留作者及链接的前提下，非商业用途随意转载分享。</copyright><description>&lt;hr>
+&lt;hr>
+&lt;p>最近想搭建一个静态网站来记录自己的生活和编程笔记等，本着不折腾的心态选择了&lt;a href="https://github.com/gohugoio/hugo">Hugo&lt;/a>引擎和&lt;a href="https://github.com/reuixiy/hugo-theme-meme">MemE&lt;/a>主题，最后发现还是挺折腾的。所以就记录下搭建过程，希望这篇博客对你有帮助。&lt;/p>
+&lt;p>本篇主要内容是使用Github Actions自动构建Hugo+meme的个人博客，并绑定自己的域名。本文默认你熟悉Git。&lt;/p>
+&lt;h3 id="部署hugo环境">部署Hugo环境&lt;/h3>
+&lt;p>该环境是在&lt;code>Windows 10&lt;/code>上搭建，平时写博客使用的是&lt;code>Visual Studio Code&lt;/code>。&lt;/p>
+&lt;h4 id="安装hugo并设置环境变量">安装hugo并设置环境变量&lt;/h4>
+&lt;p>在&lt;a href="https://github.com/gohugoio/hugo/releases/">Hugo下载地址&lt;/a>下载你操作系统对应的安装包。&lt;strong>在windows版本上有两个版本:&lt;/strong> &lt;code>Hugo&lt;/code>和&lt;code>Hugo extend&lt;/code>(extend版本支持Sass/SCSS)，根据自己的需要选择版本。笔者因为要使用&lt;code>meme&lt;/code>主题，需使用&lt;code>Hugo extend&lt;/code>。下载并解压到对应的目录，然后将其添加到系统环境变量中即可。&lt;/p>
+&lt;p>在cmd窗口中输入&lt;/p>
+&lt;pre>&lt;code>hugo version
+&lt;/code>&lt;/pre>&lt;p>输出如下类似版本信息即Hugo安装成功&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">hugo v0.85.0-724D5DB5+extended windows/amd64 &lt;span class="nv">BuildDate&lt;/span>&lt;span class="o">=&lt;/span>2021-07-05T10:46:28Z &lt;span class="nv">VendorInfo&lt;/span>&lt;span class="o">=&lt;/span>gohugoio
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="初始化你的站点">初始化你的站点&lt;/h4>
+&lt;p>在相应的目录，笔者的目录为&lt;code>C:\programs\MyGit\&lt;/code>下执行，建议使用你域名，如果没有域名，可以使用&lt;code>username.github.io&lt;/code>来创建站点&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="n">hugo&lt;/span> &lt;span class="n">new&lt;/span> &lt;span class="n">site&lt;/span> &lt;span class="n">10001001&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">xyz&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">你站点的名字&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="c"># 使用Git初始化该站点&lt;/span>
+&lt;span class="nb">cd &lt;/span>&lt;span class="n">10001001&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">xyz&lt;/span>
+&lt;span class="n">git&lt;/span> &lt;span class="n">init&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>进入&lt;code>10001001.xyz&lt;/code>目录查看站点文件信息&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="p">----&lt;/span> &lt;span class="p">-------------&lt;/span> &lt;span class="p">------&lt;/span> &lt;span class="p">----&lt;/span>
+&lt;span class="n">d&lt;/span>&lt;span class="p">-----&lt;/span> &lt;span class="n">2021&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">7&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">13&lt;/span> &lt;span class="n">18&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="n">11&lt;/span> &lt;span class="n">archetypes&lt;/span>
+&lt;span class="n">d&lt;/span>&lt;span class="p">-----&lt;/span> &lt;span class="n">2021&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">7&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">13&lt;/span> &lt;span class="n">18&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="n">11&lt;/span> &lt;span class="n">content&lt;/span>
+&lt;span class="n">d&lt;/span>&lt;span class="p">-----&lt;/span> &lt;span class="n">2021&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">7&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">13&lt;/span> &lt;span class="n">18&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="n">11&lt;/span> &lt;span class="n">data&lt;/span>
+&lt;span class="n">d&lt;/span>&lt;span class="p">-----&lt;/span> &lt;span class="n">2021&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">7&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">13&lt;/span> &lt;span class="n">18&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="n">11&lt;/span> &lt;span class="n">layouts&lt;/span>
+&lt;span class="n">d&lt;/span>&lt;span class="p">-----&lt;/span> &lt;span class="n">2021&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">7&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">13&lt;/span> &lt;span class="n">18&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="n">11&lt;/span> &lt;span class="n">static&lt;/span>
+&lt;span class="n">d&lt;/span>&lt;span class="p">-----&lt;/span> &lt;span class="n">2021&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">7&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">13&lt;/span> &lt;span class="n">18&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="n">11&lt;/span> &lt;span class="n">themes&lt;/span>
+&lt;span class="n">-a&lt;/span>&lt;span class="p">----&lt;/span> &lt;span class="n">2021&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">7&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">13&lt;/span> &lt;span class="n">18&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="n">11&lt;/span> &lt;span class="n">82&lt;/span> &lt;span class="n">config&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toml&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>hugo常用的命令&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">hugo new site path/to/site_name &lt;span class="c1"># 创建站点&lt;/span>
+hugo new xxx.md &lt;span class="c1"># 创建md页面&lt;/span>
+hugo new dir/xxx.md &lt;span class="c1"># 在目录dir下创建md页面&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="安装站点主题">安装站点主题&lt;/h3>
+&lt;p>安装自己喜欢的主题，可以去&lt;a href="https://themes.gohugo.io/">Hugo Themes&lt;/a>和&lt;code>Github&lt;/code>上寻找主题。笔者使用时&lt;code>MemE&lt;/code>极简主题，主题的一般安装步骤就是将你主题下载到站点根目录下的&lt;code>themes&lt;/code>目录下。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">git submodule add --depth &lt;span class="m">1&lt;/span> https://github.com/reuixiy/hugo-theme-meme.git themes/meme
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>再将&lt;code>themes/meme/config-examples/zh-cn/config.toml&lt;/code>文件复制并覆盖站点根目录下的&lt;code>config.toml&lt;/code>，并根据&lt;a href="https://github.com/reuixiy/hugo-theme-meme/blob/master/config-examples/zh-cn/config.tomlthemes/meme/config-examples/zh-cn/config.toml">官方示例配置&lt;/a>来个性化设置自己的站点，你也可以参考本站点的&lt;a href="https://github.com/icheontao/10001001.xyz/blob/main/config.toml">配置&lt;/a>。&lt;/p>
+&lt;p>接下来就可以执行&lt;code>hugo server&lt;/code>启动一个服务端（访问地址&lt;code>http://localhost:1313&lt;/code>）并适当修改&lt;code>config.toml&lt;/code>调试站点的布局。&lt;/p>
+&lt;p>折腾出自己想要的样式还是需要些时间。&lt;/p>
+&lt;h2 id="配置git-actions">配置Git Actions&lt;/h2>
+&lt;p>登录你的Github账号，新建仓库，可以使用你域名或者&lt;code>username.github.io&lt;/code>作为你的仓库名。&lt;/p>
+&lt;h3 id="配置github-actions">配置Github Actions&lt;/h3>
+&lt;p>在你本地站点根目录下新建目录&lt;code>.github/workflows&lt;/code>，并新建一个yml文件，名字无所谓。这里新建一个&lt;code>blog.yml&lt;/code>文件&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code class="language-yml" data-lang="yml">&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">GitHub Pages Deploy&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w">&lt;/span>&lt;span class="nt">on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">push&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">branches&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>- &lt;span class="l">main &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 需要构建的源代码分支&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w">&lt;/span>&lt;span class="nt">jobs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">deploy&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">runs-on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ubuntu-latest&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">steps&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Checkout main branch&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">actions/checkout@v2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">submodules&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">fetch-depth&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Setup Hugo&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">peaceiris/actions-hugo@v2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">hugo-version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;0.85.0&amp;#39;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Hugo版本号&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">extended&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 此处配置为 是否适用extend版本，根据自己的主题来定&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Build Hugo&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">hugo --minify&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Deploy Hugo&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">peaceiris/actions-gh-pages@v3&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">deploy_key&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ secrets.ACTIONS_DEPLOY_KEY }} &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 此处key需要配置，见文https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-create-ssh-deploy-key&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">publish_branch&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">blog &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 自动构建后发布到的分支，此处为自定义&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">publish_dir&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">./public&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">cname&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">10001001.&lt;/span>&lt;span class="l">xyz &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 你域名地址(如果有域名的话，没有则去掉该字段)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nt">commit_message&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ github.event.head_commit.message }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>接下来就是编写&lt;code>README.md&lt;/code>和&lt;code>LICENSE&lt;/code>，有了这两个文件才算是一个完整的GIT仓库。可以参考笔者的仓库&lt;a href="https://github.com/icheontao/10001001.xyz">点击查看&lt;/a>。准备提交代码，看看构建效果。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">git add .
+git commit -m &lt;span class="s2">&amp;#34;first commit&amp;#34;&lt;/span>
+git branch -M main
+&lt;span class="c1"># 设置远程仓库&lt;/span>
+git remote add origin https://github.com/icheontao/10001001.xyz.git &lt;span class="c1"># 此处为你仓库地址&lt;/span>
+git push -u origin main
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>打开仓库地址，点击&lt;code>Actions&lt;/code>，查看构建结果。
+&lt;img src="imags/github_actions.png" alt="Github Actions构建结果">&lt;/p>
+&lt;h2 id="配置github-pages">配置Github Pages&lt;/h2>
+&lt;p>登录到你的站点Github下，点击 &lt;code>Setttings&lt;/code> -&amp;gt; &lt;code>Pages&lt;/code>进行对应的设置，如下：(标红处是需要注意的地方)
+&lt;img src="images/github_pages_setting.png" alt="github pages settings">&lt;/p>
+&lt;p>&lt;strong>Branch: 为你自定义的git分支；Enforce HTTPS: 为强制开启HTTPS，如果开启的话，需要等待一段时间刷新即可，Github会自动给你生成证书&lt;/strong>&lt;/p>
+&lt;h2 id="自定义域名解析可选">自定义域名解析(可选)&lt;/h2>
+&lt;p>笔者域名在阿里云，以下步骤都是在阿里云控制台完成。其他厂商可自行登录到域名解析界面操作。&lt;/p>
+&lt;p>添加一条&lt;code>CNAME&lt;/code>记录到&lt;code>username.github.io&lt;/code>(username为你github用户名)
+并添加&lt;code>A&lt;/code>记录到&lt;code>Github Pages&lt;/code>的IP地址：(至少一个)&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">185.199.108.153
+185.199.109.153
+185.199.110.153
+185.199.111.153
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>最后域名解析状态如下:
+&lt;img src="images/github_pages_setting_2.png" alt="域名解析状态">&lt;/p>
+&lt;p>域名解析具体说明见&lt;a href="https://docs.github.com/cn/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site">配置Github Pages站点的自定义域&lt;/a>&lt;/p>
+&lt;h2 id="结束">结束&lt;/h2>
+&lt;p>最后添加文章，提交github，查看站点&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="c1"># 1. 新建md文件&lt;/span>
+hugo new xxx.md
+&lt;span class="c1"># 2. 编辑文件&lt;/span>
+&lt;span class="c1"># 3. 提交代码(由于每次写完都要提交，所以这一步可集成到脚本中，参考见update_pages.sh，在windows上使用Git Bash下运行)&lt;/span>
+git add .
+git commit -m &lt;span class="s2">&amp;#34;commit msg&amp;#34;&lt;/span>
+git push
+&lt;span class="c1"># 查看站点&lt;/span>
+&lt;span class="c1"># 查看github actions构建是否构建成功，最后就可以看到文章自动构建到你的站点了。&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>enjoy.&lt;/p></description><category domain="https://10001001.xyz/programming/">programming</category><category domain="https://10001001.xyz/tags/%E6%95%99%E7%A8%8B/">教程</category><category domain="https://10001001.xyz/tags/hugo/">hugo</category><category domain="https://10001001.xyz/tags/github-actions/">github actions</category></item></channel></rss>
