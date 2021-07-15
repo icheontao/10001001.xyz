@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Icheon Tao's Blog</title><link>https://10001001.xyz/</link><description>Tao's Blog. 记录个人生活和技术.</description><generator>Hugo 0.85.0 https://gohugo.io/</generator><language>zh-CN</language><managingEditor>icheontao@gmail.com (Icheon Tao)</managingEditor><webMaster>icheontao@gmail.com (Icheon Tao)</webMaster><copyright>本文在保留作者及链接的前提下，非商业用途随意转载分享。</copyright><lastBuildDate>Wed, 14 Jul 2021 12:39:41 +0000</lastBuildDate><atom:link rel="self" type="application/rss+xml" href="https://10001001.xyz/rss.xml"/><item><title>使用Github Actions自动构建Hugo个人博客</title><link>https://10001001.xyz/programming/use-github-actions-building-hugo-blog/</link><guid isPermaLink="true">https://10001001.xyz/programming/use-github-actions-building-hugo-blog/</guid><pubDate>Wed, 14 Jul 2021 20:07:57 +0800</pubDate><author>icheontao@gmail.com (Icheon Tao)</author><copyright>本文在保留作者及链接的前提下，非商业用途随意转载分享。</copyright><description>&lt;hr>
-&lt;hr>
-&lt;p>最近想搭建一个静态网站来记录自己的生活和编程笔记等，本着不折腾的心态选择了&lt;a href="https://github.com/gohugoio/hugo">Hugo&lt;/a>引擎和&lt;a href="https://github.com/reuixiy/hugo-theme-meme">MemE&lt;/a>主题，最后发现还是挺折腾的。所以就记录下搭建过程，希望这篇博客对你有帮助。&lt;/p>
+<?xml version="1.0" encoding="utf-8"?><rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Icheon Tao's Blog</title><link>https://10001001.xyz/</link><description>Tao's Blog. 记录个人生活和技术.</description><generator>Hugo 0.85.0 https://gohugo.io/</generator><language>zh-CN</language><managingEditor>icheontao@gmail.com (Icheon Tao)</managingEditor><webMaster>icheontao@gmail.com (Icheon Tao)</webMaster><copyright>本文在保留作者及链接的前提下，非商业用途随意转载分享。</copyright><lastBuildDate>Thu, 15 Jul 2021 07:59:53 +0000</lastBuildDate><atom:link rel="self" type="application/rss+xml" href="https://10001001.xyz/rss.xml"/><item><title>使用Github Actions自动构建Hugo个人博客</title><link>https://10001001.xyz/programming/use-github-actions-building-hugo-blog/</link><guid isPermaLink="true">https://10001001.xyz/programming/use-github-actions-building-hugo-blog/</guid><pubDate>Wed, 14 Jul 2021 20:07:57 +0800</pubDate><author>icheontao@gmail.com (Icheon Tao)</author><copyright>本文在保留作者及链接的前提下，非商业用途随意转载分享。</copyright><description>&lt;p>最近想搭建一个静态网站来记录自己的生活和编程笔记等，本着不折腾的心态选择了&lt;a href="https://github.com/gohugoio/hugo">Hugo&lt;/a>引擎和&lt;a href="https://github.com/reuixiy/hugo-theme-meme">MemE&lt;/a>主题，最后发现还是挺折腾的。所以就记录下搭建过程，希望这篇博客对你有帮助。&lt;/p>
 &lt;p>本篇主要内容是使用Github Actions自动构建Hugo+meme的个人博客，并绑定自己的域名。本文默认你熟悉Git。&lt;/p>
 &lt;h3 id="部署hugo环境">部署Hugo环境&lt;/h3>
 &lt;p>该环境是在&lt;code>Windows 10&lt;/code>上搭建，平时写博客使用的是&lt;code>Visual Studio Code&lt;/code>。&lt;/p>
@@ -182,10 +180,10 @@ git push -u origin main
 &lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
 &lt;/div>&lt;p>打开仓库地址，点击&lt;code>Actions&lt;/code>，查看构建结果。
-&lt;img src="images/github_actions.png" alt="Github Actions构建结果">&lt;/p>
+&lt;img src="uploads/github_actions.png" alt="Github Actions构建结果">&lt;/p>
 &lt;h2 id="配置github-pages">配置Github Pages&lt;/h2>
 &lt;p>登录到你的站点Github下，点击 &lt;code>Setttings&lt;/code> -&amp;gt; &lt;code>Pages&lt;/code>进行对应的设置，如下：(标红处是需要注意的地方)
-&lt;img src="images/github_pages_setting.png" alt="github pages settings">&lt;/p>
+&lt;img src="uploads/github_pages_setting.png" alt="github pages settings">&lt;/p>
 &lt;p>&lt;strong>Branch: 为你自定义的git分支；Enforce HTTPS: 为强制开启HTTPS，如果开启的话，需要等待一段时间刷新即可，Github会自动给你生成证书&lt;/strong>&lt;/p>
 &lt;h2 id="自定义域名解析可选">自定义域名解析(可选)&lt;/h2>
 &lt;p>笔者域名在阿里云，以下步骤都是在阿里云控制台完成。其他厂商可自行登录到域名解析界面操作。&lt;/p>
@@ -206,7 +204,7 @@ git push -u origin main
 &lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
 &lt;/div>&lt;p>最后域名解析状态如下:
-&lt;img src="images/github_pages_setting_2.png" alt="域名解析状态">&lt;/p>
+&lt;img src="uploads/github_pages_setting_2.png" alt="域名解析状态">&lt;/p>
 &lt;p>域名解析具体说明见&lt;a href="https://docs.github.com/cn/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site">配置Github Pages站点的自定义域&lt;/a>&lt;/p>
 &lt;h2 id="结束">结束&lt;/h2>
 &lt;p>最后添加文章，提交github，查看站点&lt;/p>
@@ -236,4 +234,4 @@ git push
 &lt;span class="c1"># 查看github actions构建是否构建成功，最后就可以看到文章自动构建到你的站点了。&lt;/span>
 &lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
-&lt;/div>&lt;p>enjoy.&lt;/p></description><category domain="https://10001001.xyz/programming/">programming</category><category domain="https://10001001.xyz/tags/%E6%95%99%E7%A8%8B/">教程</category><category domain="https://10001001.xyz/tags/hugo/">hugo</category><category domain="https://10001001.xyz/tags/github-actions/">github actions</category></item></channel></rss>
+&lt;/div>&lt;p>Enjoy.&lt;/p></description><category domain="https://10001001.xyz/programming/">programming</category><category domain="https://10001001.xyz/tags/%E6%95%99%E7%A8%8B/">教程</category><category domain="https://10001001.xyz/tags/hugo/">hugo</category><category domain="https://10001001.xyz/tags/github-actions/">github actions</category></item></channel></rss>
