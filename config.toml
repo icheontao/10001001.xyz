@@ -79,7 +79,7 @@ uglyURLs = false
     [markup.highlight]
         codeFences = true
         guessSyntax = false
-        lineNos = true
+        lineNos = false
         lineNumbersInTable = false
         noClasses = false
     [markup.tableOfContents]
