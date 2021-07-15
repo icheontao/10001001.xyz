@@ -598,8 +598,8 @@ uglyURLs = false
     autoLoadComments = false
 
     ## Disqus
-    enableDisqus = false
-    disqusShortname = ""
+    enableDisqus = true
+    disqusShortname = "Icheon Tao"
 
     ## Valine
     enableValine = false
@@ -1065,7 +1065,7 @@ uglyURLs = false
     enablePostGitInfo = true
 
     # 是否显示（全局设置）
-    displayPostGitInfo = false
+    displayPostGitInfo = true
     # 说明：文章的 Front Matter 中的 `gitinfo`
     #      的优先级高于此处
 
@@ -1362,7 +1362,7 @@ uglyURLs = false
     # 404 页面
 
     # 视频封面
-    fofPoster = ""
+    fofPoster = "images/ivan-rudoy-Ot90TwQGAeE-unsplash.jpg"
 
     # 视频地址
     fofVideoWebm = ""

@@ -10,8 +10,6 @@ author: "Icheon Tao"
 slug: "use-github-actions-building-hugo-blog"
 toc: false
 ---
----
----
 最近想搭建一个静态网站来记录自己的生活和编程笔记等，本着不折腾的心态选择了[Hugo](https://github.com/gohugoio/hugo)引擎和[MemE](https://github.com/reuixiy/hugo-theme-meme)主题，最后发现还是挺折腾的。所以就记录下搭建过程，希望这篇博客对你有帮助。
 
 本篇主要内容是使用Github Actions自动构建Hugo+meme的个人博客，并绑定自己的域名。本文默认你熟悉Git。
@@ -122,11 +120,11 @@ git remote add origin https://github.com/icheontao/10001001.xyz.git # 此处为�
 git push -u origin main
 ```
 打开仓库地址，点击`Actions`，查看构建结果。
-![Github Actions构建结果](images/github_actions.png)
+![Github Actions构建结果](uploads/github_actions.png)
 
 ## 配置Github Pages
 登录到你的站点Github下，点击 `Setttings` -> `Pages`进行对应的设置，如下：(标红处是需要注意的地方)
-![github pages settings](images/github_pages_setting.png)
+![github pages settings](uploads/github_pages_setting.png)
 
 **Branch: 为你自定义的git分支；Enforce HTTPS: 为强制开启HTTPS，如果开启的话，需要等待一段时间刷新即可，Github会自动给你生成证书**
 
@@ -142,7 +140,7 @@ git push -u origin main
 185.199.111.153
 ```
 最后域名解析状态如下:
-![域名解析状态](images/github_pages_setting_2.png)
+![域名解析状态](uploads/github_pages_setting_2.png)
 
 域名解析具体说明见[配置Github Pages站点的自定义域](https://docs.github.com/cn/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site)
 
@@ -161,4 +159,4 @@ git push
 # 查看站点
 # 查看github actions构建是否构建成功，最后就可以看到文章自动构建到你的站点了。
 ```
-enjoy.
+Enjoy.
