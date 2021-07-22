@@ -21,7 +21,7 @@ slug: "add_png_chunks_with_python"
 由于是只处理PNG图片，这里用到是`PyPNG`模块，该项目Github可访问[drj11/pypng](https://github.com/drj11/pypng)
 
 这里使用下面这张图片来测试
-![ivan-rudoy-Ot90TwQGAeE-unsplash](imags/ivan-rudoy-Ot90TwQGAeE-unsplash.png)
+![ivan-rudoy-Ot90TwQGAeE-unsplash](images/ivan-rudoy-Ot90TwQGAeE-unsplash.png)
 
 使用的代码如下：
 ```python
