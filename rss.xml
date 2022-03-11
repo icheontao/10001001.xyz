@@ -1,4 +1,304 @@
-<?xml version="1.0" encoding="utf-8"?><rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Icheon Tao's Blog</title><link>https://10001001.xyz/</link><description>Tao's Blog. 记录个人生活和技术.</description><generator>Hugo 0.85.0 https://gohugo.io/</generator><language>zh-CN</language><managingEditor>icheontao@gmail.com (Icheon Tao)</managingEditor><webMaster>icheontao@gmail.com (Icheon Tao)</webMaster><copyright>本文在保留作者及链接的前提下，非商业用途随意转载分享。</copyright><lastBuildDate>Fri, 11 Mar 2022 09:31:17 +0000</lastBuildDate><atom:link rel="self" type="application/rss+xml" href="https://10001001.xyz/rss.xml"/><item><title>使用Python添加PNG图片隐藏块(隐写字符串)</title><link>https://10001001.xyz/programming/add_png_chunks_with_python/</link><guid isPermaLink="true">https://10001001.xyz/programming/add_png_chunks_with_python/</guid><pubDate>Thu, 22 Jul 2021 22:26:35 +0800</pubDate><author>icheontao@gmail.com (Icheon Tao)</author><copyright>本文在保留作者及链接的前提下，非商业用途随意转载分享。</copyright><description>&lt;p>最近想批量给PNG图片添加一些隐藏标识，所以google一番，这里记录一下。&lt;/p>
+<?xml version="1.0" encoding="utf-8"?><rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Icheon Tao's Blog</title><link>https://10001001.xyz/</link><description>Tao's Blog. 记录个人生活和技术.</description><generator>Hugo 0.85.0 https://gohugo.io/</generator><language>zh-CN</language><managingEditor>icheontao@gmail.com (Icheon Tao)</managingEditor><webMaster>icheontao@gmail.com (Icheon Tao)</webMaster><copyright>本文在保留作者及链接的前提下，非商业用途随意转载分享。</copyright><lastBuildDate>Fri, 11 Mar 2022 09:38:02 +0000</lastBuildDate><atom:link rel="self" type="application/rss+xml" href="https://10001001.xyz/rss.xml"/><item><title>算术表达式</title><link>https://10001001.xyz/programming/arithmetic_expression/</link><guid isPermaLink="true">https://10001001.xyz/programming/arithmetic_expression/</guid><pubDate>Fri, 11 Mar 2022 16:12:18 +0800</pubDate><author>icheontao@gmail.com (Icheon Tao)</author><copyright>本文在保留作者及链接的前提下，非商业用途随意转载分享。</copyright><description>&lt;p>好久没写博客，最近想把数据结构与算法好好学下，在这里记录下。希望能坚持下去！&lt;/p>
+&lt;p>&lt;strong>前缀表达式&lt;/strong>（操作符在操作数之前）是一种没有括号的表达式。也叫&lt;code>波兰式&lt;/code>&lt;/p>
+&lt;p>&lt;strong>中缀表达式&lt;/strong>（操作符在操作数之间）是我们平时最常见的表达式，计算规则就是先乘除后加减，有括号，先计算括号里面的表达式，再括号外。&lt;/p>
+&lt;p>&lt;strong>后缀表达式&lt;/strong>（操作符在操作数后面）是一种已经考虑了运算符优先级，没有括号的表达式。也叫&lt;code>逆波兰式&lt;/code>&lt;/p>
+&lt;p>需求：&lt;/p>
+&lt;ul>
+&lt;li>新建数据结构&lt;code>栈(Stack)&lt;/code>&lt;/li>
+&lt;li>将中缀表达式转化为后缀表达式&lt;/li>
+&lt;li>计算后缀表达式&lt;/li>
+&lt;/ul>
+&lt;p>此算法使用Golang实现。&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-golang" data-lang="golang">&lt;span class="kn">package&lt;/span> &lt;span class="nx">main&lt;/span>
+&lt;span class="kn">import&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;span class="s">&amp;#34;errors&amp;#34;&lt;/span>
+&lt;span class="s">&amp;#34;fmt&amp;#34;&lt;/span>
+&lt;span class="s">&amp;#34;strconv&amp;#34;&lt;/span>
+&lt;span class="p">)&lt;/span>
+&lt;span class="c1">// 栈
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">type&lt;/span> &lt;span class="nx">ArrayStack&lt;/span> &lt;span class="kd">struct&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="c1">// 栈的大小
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">maxStack&lt;/span> &lt;span class="kt">int&lt;/span>
+&lt;span class="c1">// 模拟栈
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">stack&lt;/span> &lt;span class="p">[]&lt;/span>&lt;span class="kd">interface&lt;/span>&lt;span class="p">{}&lt;/span>
+&lt;span class="c1">// 当前栈所在的位置
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">top&lt;/span> &lt;span class="kt">int&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="kd">func&lt;/span> &lt;span class="nf">NewStack&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">maxStack&lt;/span> &lt;span class="kt">int&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">ArrayStack&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="nx">ArrayStack&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="nx">maxStack&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nx">maxStack&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nx">stack&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">make&lt;/span>&lt;span class="p">([]&lt;/span>&lt;span class="kd">interface&lt;/span>&lt;span class="p">{},&lt;/span> &lt;span class="nx">maxStack&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="nx">top&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="cm">/*
+&lt;/span>&lt;span class="cm">1. 压栈
+&lt;/span>&lt;span class="cm">2. 弹栈
+&lt;/span>&lt;span class="cm">3. 判断是否是空栈
+&lt;/span>&lt;span class="cm">4. 判断是否是满栈
+&lt;/span>&lt;span class="cm">5. 查看栈顶数据
+&lt;/span>&lt;span class="cm">6. 打印栈列表
+&lt;/span>&lt;span class="cm">*/&lt;/span>
+&lt;span class="c1">// 是否为满栈
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">as&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">ArrayStack&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">IsFull&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="kt">bool&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">top&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">maxStack&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// 是否为空栈
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">as&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">ArrayStack&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">IsEmpty&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="kt">bool&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">top&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// 弹栈
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">as&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">ArrayStack&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">Pop&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">interface&lt;/span>&lt;span class="p">{},&lt;/span> &lt;span class="kt">error&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">IsEmpty&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;该栈为空&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="kc">nil&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">New&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;该栈为空&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">value&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">stack&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">top&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">top&lt;/span>&lt;span class="o">--&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">value&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kc">nil&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// 压栈
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">as&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">ArrayStack&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">value&lt;/span> &lt;span class="kd">interface&lt;/span>&lt;span class="p">{})&lt;/span> &lt;span class="kt">error&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">IsFull&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;该栈已满&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">New&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;该栈已满&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">top&lt;/span>&lt;span class="o">++&lt;/span>
+&lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">stack&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">top&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">value&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="kc">nil&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// 查看栈顶的值
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">as&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">ArrayStack&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">Peek&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="kd">interface&lt;/span>&lt;span class="p">{}&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">stack&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">top&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// 打印栈
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">as&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nx">ArrayStack&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="nf">PrintList&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="kt">error&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">IsEmpty&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;该栈为空，未找到任何数据&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">New&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;该栈为空，未找到任何数据&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="k">for&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">top&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">--&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;stack[%d]: %v\n&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">as&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">stack&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="kc">nil&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>以上代码以实现一个栈的数据结构。接下来测试下&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-golang" data-lang="golang">&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="c1">///**
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// 实例化
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">stack1&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nf">NewStack&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="c1">// 压栈操作
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">stack1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">stack1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">stack1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">stack1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">stack1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">stack1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;a&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">stack1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;b&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">stack1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;c&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">stack1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;d&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">stack1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;e&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="c1">// 打印栈数据
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">stack1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">PrintList&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;==============================&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="c1">// 弹栈
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">val&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">_&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">stack1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Pop&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;栈弹出的值为：%v\n&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">val&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;==============================&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">stack1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">PrintList&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>输出结果为：&lt;/p>
+&lt;pre>&lt;code>此栈已满
+此栈已满
+stack[7]: c
+stack[6]: b
+stack[5]: a
+stack[4]: 5
+stack[3]: 4
+stack[2]: 3
+stack[1]: 2
+stack[0]: 1
+==============================
+栈弹出的值为：c
+==============================
+stack[6]: b
+stack[5]: a
+stack[4]: 5
+stack[3]: 4
+stack[2]: 3
+stack[1]: 2
+stack[0]: 1
+&lt;/code>&lt;/pre>&lt;p>接下来继续添加函数来处理我们中缀表达式&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-golang" data-lang="golang">&lt;span class="c1">// 是否为操作符
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">IsOperator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">op&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">bool&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">switch&lt;/span> &lt;span class="nx">op&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">case&lt;/span> &lt;span class="s">&amp;#34;+&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;*&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;/&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;(&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;)&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="kc">true&lt;/span>
+&lt;span class="k">default&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="kc">false&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// 优先级
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">Priority&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">op&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">switch&lt;/span> &lt;span class="nx">op&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">case&lt;/span> &lt;span class="s">&amp;#34;*&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;/&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;span class="k">case&lt;/span> &lt;span class="s">&amp;#34;+&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;span class="k">default&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// 计算
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">Compute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">op&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">num1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">num2&lt;/span> &lt;span class="kt">int&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">switch&lt;/span> &lt;span class="nx">op&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">case&lt;/span> &lt;span class="s">&amp;#34;*&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">num1&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="nx">num2&lt;/span>
+&lt;span class="k">case&lt;/span> &lt;span class="s">&amp;#34;/&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">num1&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="nx">num2&lt;/span>
+&lt;span class="k">case&lt;/span> &lt;span class="s">&amp;#34;+&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">num1&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">num2&lt;/span>
+&lt;span class="k">case&lt;/span> &lt;span class="s">&amp;#34;-&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">num1&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="nx">num2&lt;/span>
+&lt;span class="k">default&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// 字符串类型转整数类型
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">string_to_int&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">str&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">num&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">strconv&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Atoi&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">str&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;转换失败&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">num&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="cm">/*
+&lt;/span>&lt;span class="cm">中缀表达式转化为后缀表达式
+&lt;/span>&lt;span class="cm">1. 遍历中缀表达式字符串
+&lt;/span>&lt;span class="cm"> 1.1 如果遇到操作数就存入后缀表达式变量中
+&lt;/span>&lt;span class="cm"> 1.2 如果遇到操作符(&amp;#39;*&amp;#39;,&amp;#39;+&amp;#39;,&amp;#39;-&amp;#39;,&amp;#39;/&amp;#39;,&amp;#39;(&amp;#39;)，新建一个栈来存储操作符:
+&lt;/span>&lt;span class="cm"> 1.2.1 如果是&amp;#39;(&amp;#39;，压入栈中
+&lt;/span>&lt;span class="cm"> 1.2.2 如果是&amp;#39;)&amp;#39;, 则将栈中的操作符存入后缀表达式变量中，直到在栈中读取到&amp;#39;(&amp;#39;
+&lt;/span>&lt;span class="cm"> 1.2.3 如果不是&amp;#39;(&amp;#39;, &amp;#39;)&amp;#39;， 比较该操作符与栈顶的操作符的优先级
+&lt;/span>&lt;span class="cm"> 1.2.3.1 如果该操作符的优先级比栈顶操作符的优先级高，则入栈
+&lt;/span>&lt;span class="cm"> 1.2.3.2 反之，将栈顶的操作符取出(pop())放入后缀表达式变量中，重复1.2.3步操作，直到将其压入栈中
+&lt;/span>&lt;span class="cm">2. 遍历完中缀表达式后，读取栈中数据，如栈中还有操作符，将其依次pop()取出存入后缀表达式变量中
+&lt;/span>&lt;span class="cm">*/&lt;/span>
+&lt;span class="c1">// 生成后缀表达式
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">GenerateSuffixexpression&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">exp&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">suffixExpression&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="kt">error&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="c1">// 实例化一个栈来暂存操作符
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">stack&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nf">NewStack&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">exp&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="k">for&lt;/span> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">e&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="k">range&lt;/span> &lt;span class="nx">exp&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="c1">// 1步骤
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">char&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nb">string&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nf">IsOperator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">char&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">char&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s">&amp;#34;(&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="c1">// 1.2.1
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">char&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="nx">char&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s">&amp;#34;)&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="c1">// 1.2.2
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">IsEmpty&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">err&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nx">errors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">New&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;表达式错误，请检查！&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">return&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Peek&lt;/span>&lt;span class="p">().(&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s">&amp;#34;(&amp;#34;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Pop&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="k">break&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">tmp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">_&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Pop&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="nx">suffixExpression&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="nx">tmp&lt;/span>&lt;span class="p">.(&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="c1">// 1.2.3
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">IsEmpty&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">break&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">tmp&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Peek&lt;/span>&lt;span class="p">().(&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nf">Priority&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">char&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">&amp;gt;&lt;/span> &lt;span class="nf">Priority&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">tmp&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="c1">// 1.2.3.1
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">break&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">suffixExpression&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="nx">tmp&lt;/span>
+&lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Pop&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">char&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="c1">// 1.1
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">suffixExpression&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="nx">char&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// 遍历完中缀表达式后，查看栈中是否还有数据，如有，则取出追加到后缀表达式变量中
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="c1">//2
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">IsEmpty&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">break&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">tmp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">_&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Pop&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="nx">suffixExpression&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="nx">tmp&lt;/span>&lt;span class="p">.(&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;中缀表达式：&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">exp&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;后缀表达式：&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">suffixExpression&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">return&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// 计算后序表达式
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kd">func&lt;/span> &lt;span class="nf">Calculate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">exp&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">stack&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nf">NewStack&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">exp&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="k">for&lt;/span> &lt;span class="nx">_&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">e&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="k">range&lt;/span> &lt;span class="nx">exp&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">char&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nb">string&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="c1">// 如果是运算符
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="nf">IsOperator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">char&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">IsEmpty&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">break&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">num2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">_&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Pop&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="nx">num1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">_&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Pop&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="nx">x1&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nf">string_to_int&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">num1&lt;/span>&lt;span class="p">.(&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="nx">x2&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nf">string_to_int&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">num2&lt;/span>&lt;span class="p">.(&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="nx">rs&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Sprintf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;%d&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nf">Compute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">char&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">x1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">x2&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">rs&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Caclulate() %d %s %d = %s\n&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">x1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">char&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">x2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">rs&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="c1">// 如果是数字
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">char&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Caclulate() char:&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">char&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="p">!&lt;/span>&lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">IsEmpty&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">res&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nx">stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Pop&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Pop()异常&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">return&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;表达式运算结果为：&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">res&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>已上就是将中缀表达式转化为后缀表达式，并计算结果有关的函数，测试如下：&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-golang" data-lang="golang">
+&lt;span class="kd">func&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="cm">/*使用栈实现计算字符串表达式*/&lt;/span>
+&lt;span class="nx">res&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">:=&lt;/span> &lt;span class="nf">GenerateSuffixexpression&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;5*(3*4+(3+2))+(5+3)/2&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="nx">err&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="kc">nil&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;异常&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">fmt&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">Println&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;==============================&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="nf">Calculate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">res&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>结果如下：&lt;/p>
+&lt;pre>&lt;code>中缀表达式： 5*(3*4+(3+2))+(5+3)/2
+后缀表达式： 534*32++*53+2/+
+==============================
+Caclulate() char: 5
+Caclulate() char: 3
+Caclulate() char: 4
+Caclulate() 3 * 4 = 12
+Caclulate() char: 3
+Caclulate() char: 2
+Caclulate() 3 + 2 = 5
+Caclulate() 12 + 5 = 17
+Caclulate() 5 * 17 = 85
+Caclulate() char: 5
+Caclulate() char: 3
+Caclulate() 5 + 3 = 8
+Caclulate() char: 2
+Caclulate() 8 / 2 = 4
+Caclulate() 85 + 4 = 89
+表达式运算结果为： 89
+&lt;/code>&lt;/pre>&lt;p>Enjoy.&lt;/p></description><category domain="https://10001001.xyz/programming/">programming</category><category domain="https://10001001.xyz/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</category><category domain="https://10001001.xyz/tags/golang/">Golang</category><category domain="https://10001001.xyz/tags/%E6%A0%88/">栈</category></item><item><title>使用Python添加PNG图片隐藏块(隐写字符串)</title><link>https://10001001.xyz/programming/add_png_chunks_with_python/</link><guid isPermaLink="true">https://10001001.xyz/programming/add_png_chunks_with_python/</guid><pubDate>Thu, 22 Jul 2021 22:26:35 +0800</pubDate><author>icheontao@gmail.com (Icheon Tao)</author><copyright>本文在保留作者及链接的前提下，非商业用途随意转载分享。</copyright><description>&lt;p>最近想批量给PNG图片添加一些隐藏标识，所以google一番，这里记录一下。&lt;/p>
 &lt;p>首先是了解PNG文件格式结构&lt;a href="https://10001001.xyz/programming/add_png_chunks_with_python/#refer-anchor">&lt;sup>1&lt;/sup>&lt;/a>，PNG数据块Chunk主要是有&lt;code>IHDR&lt;/code>、&lt;code>IDAT&lt;/code>和&lt;code>IEND&lt;/code>组成(缺一不可)&lt;/p>
 &lt;p>本篇的主角&lt;code>tEXt&lt;/code>和&lt;code>zTXt&lt;/code>数据块：
 - &lt;code>tEXt&lt;/code>: 文本信息数据块 [可选] 所在PNG文件结构的位置无限制
