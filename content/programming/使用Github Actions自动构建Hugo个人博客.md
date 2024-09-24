@@ -74,27 +74,24 @@ git submodule add --depth 1 https://github.com/reuixiy/hugo-theme-meme.git theme
 在你本地站点根目录下新建目录`.github/workflows`，并新建一个yml文件，名字无所谓。这里新建一个`blog.yml`文件
 ```yml
 name: GitHub Pages Deploy
-
 on:
   push: 
     branches:
-      - main                        # 需要构建的源代码分支
-
+      - main
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: true
           fetch-depth: 0
-        
       - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
+        uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: '0.85.0'    # Hugo版本号
-          extended: true            # 此处配置为 是否适用extend版本，根据自己的主题来定
+          hugo-version: 'latest'
+          extended: true
 
       - name: Build Hugo
         run: hugo --minify
@@ -102,10 +99,10 @@ jobs:
       - name: Deploy Hugo
         uses: peaceiris/actions-gh-pages@v3
         with:
-          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}     # 此处key需要配置，见文https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-create-ssh-deploy-key
-          publish_branch: blog                              # 自动构建后发布到的分支，此处为自定义
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          publish_branch: blog
           publish_dir: ./public
-          cname: 10001001.xyz                               # 你域名地址(如果有域名的话，没有则去掉该字段)
+          cname: 10001001.xyz
           commit_message: ${{ github.event.head_commit.message }}
 ```
 接下来就是编写`README.md`和`LICENSE`，有了这两个文件才算是一个完整的GIT仓库。可以参考笔者的仓库[点击查看](https://github.com/icheontao/10001001.xyz)。准备提交代码，看看构建效果。

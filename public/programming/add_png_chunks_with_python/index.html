@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#"><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.134.3"><meta name="theme-color" content="#16171d" />
+    <meta name="color-scheme" content="light dark">
+
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>使用Python添加PNG图片隐藏块(隐写字符串) | Icheon Tao&#39;s Blog</title>
+
+    <link rel="stylesheet" href="/css/meme.min.css" />
+
+    
+    
+        
+            <script src="/js/meme.min.js"></script>
+
+        
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;family=Zhi&#43;Mang&#43;Xing&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;family=Zhi&#43;Mang&#43;Xing&amp;display=swap" /></noscript>
+
+    <meta name="author" content="Icheon Tao" /><meta name="description" content="最近想批量给PNG图片添加一些隐藏标识，所以google一番，这里记录一下。
+首先是了解PNG文件格式结构1，PNG数据块Chunk主要是有IHDR、IDAT和IEND组成(缺一不可)
+本篇的主角tEXt和zTXt数据块： - tEXt: 文本信息数据块 [可选] 所在PNG文件结构的位置无限制 - zTXt: 压缩文本数据块 [可选] 所在PNG文件结构的位置无限制
+" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Icheon Tao&#39;s Blog" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="Icheon Tao&#39;s Blog" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+        <link rel="canonical" href="http://172.21.155.100:1313/programming/add_png_chunks_with_python/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2021-07-22T22:26:35+08:00",
+        "dateModified": "2024-09-24T16:11:49+08:00",
+        "url": "http://172.21.155.100:1313/programming/add_png_chunks_with_python/",
+        "headline": "使用Python添加PNG图片隐藏块(隐写字符串)",
+        "description": "最近想批量给PNG图片添加一些隐藏标识，所以google一番，这里记录一下。\n首先是了解PNG文件格式结构1，PNG数据块Chunk主要是有IHDR、IDAT和IEND组成(缺一不可)\n本篇的主角tEXt和zTXt数据块： - tEXt: 文本信息数据块 [可选] 所在PNG文件结构的位置无限制 - zTXt: 压缩文本数据块 [可选] 所在PNG文件结构的位置无限制\n",
+        "inLanguage" : "zh-CN",
+        "articleSection": "programming",
+        "wordCount":  1535 ,
+        "image": ["http://172.21.155.100:1313/images/ivan-rudoy-Ot90TwQGAeE-unsplash.png"],
+        "author": {
+            "@type": "Person",
+            "url": "http://172.21.155.100:1313/",
+            
+        },
+        "license": "本文在保留作者及链接的前提下，非商业用途随意转载分享。[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Icheon Tao's Blog",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "http://172.21.155.100:1313/icons/site-icon.png"
+            },
+            "url": "http://172.21.155.100:1313/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "http://172.21.155.100:1313/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary_large_image" />
+
+
+<meta name="twitter:site" content="@icheontao" />
+
+    
+
+
+
+<meta property="og:title" content="使用Python添加PNG图片隐藏块(隐写字符串)" />
+<meta property="og:description" content="最近想批量给PNG图片添加一些隐藏标识，所以google一番，这里记录一下。
+首先是了解PNG文件格式结构1，PNG数据块Chunk主要是有IHDR、IDAT和IEND组成(缺一不可)
+本篇的主角tEXt和zTXt数据块： - tEXt: 文本信息数据块 [可选] 所在PNG文件结构的位置无限制 - zTXt: 压缩文本数据块 [可选] 所在PNG文件结构的位置无限制
+" />
+<meta property="og:url" content="http://172.21.155.100:1313/programming/add_png_chunks_with_python/" />
+<meta property="og:site_name" content="Icheon Tao&#39;s Blog" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="http://172.21.155.100:1313/images/ivan-rudoy-Ot90TwQGAeE-unsplash.png" />
+<meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2021-07-22T22:26:35&#43;08:00" />
+    <meta property="article:modified_time" content="2024-09-24T16:11:49&#43;08:00" />
+    
+    <meta property="article:section" content="programming" />
+
+
+
+    
+    
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">Icheon Tao&#39;s Blog</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+
+        
+            
+                <li class="menu-item"><a href=""><svg t="1625905677513" class="icon life" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6002" width="128" height="128"><path d="M641.561309 479.184617 215.51289 479.184617c-83.508949 0-151.454434-67.927065-151.454434-151.419641 0-20.033265 16.236799-36.275181 36.275181-36.275181 20.039405 0 36.275181 16.242939 36.275181 36.275181 0 43.490513 35.402301 78.868255 78.904071 78.868255l426.048419 0c43.502793 0 78.903048-35.377742 78.903048-78.868255 0-20.033265 16.235776-36.275181 36.275181-36.275181 20.040429 0 36.275181 16.242939 36.275181 36.275181C793.015743 411.256528 725.071282 479.184617 641.561309 479.184617z" p-id="6003"></path><path d="M640.709919 902.162094 216.364281 902.162094c-83.250052 0-150.98269-67.710125-150.98269-150.947897L65.381591 326.83786c0-83.243913 67.732637-150.97041 150.98269-150.97041l44.789089 0c20.039405 0 36.275181 16.242939 36.275181 36.275181s-16.235776 36.275181-36.275181 36.275181l-44.789089 0c-43.242873 0-78.432327 35.177174-78.432327 78.420047l0 424.376337c0 43.230594 35.189454 78.396511 78.432327 78.396511l424.346661 0c43.242873 0 78.432327-35.165918 78.432327-78.396511L719.143269 326.83786c0-43.24185-35.190477-78.420047-78.432327-78.420047l-56.94085 0c-20.037359 0-36.275181-16.242939-36.275181-36.275181s16.237823-36.275181 36.275181-36.275181l56.94085 0c83.250052 0 150.98269 67.727521 150.98269 150.97041l0 424.376337C791.692608 834.452993 723.959971 902.162094 640.709919 902.162094z" p-id="6004"></path><path d="M766.470157 754.084571c-20.037359 0-36.273135-16.236799-36.273135-36.275181 0-20.032242 16.235776-36.275181 36.273135-36.275181 66.671469 0 120.92-54.243415 120.92-120.917954 0-66.677609-54.248531-120.918977-120.92-120.918977-20.037359 0-36.273135-16.242939-36.273135-36.275181s16.235776-36.275181 36.273135-36.275181c106.677625 0 193.470363 86.791715 193.470363 193.46934C959.94052 667.291832 873.147782 754.084571 766.470157 754.084571z" p-id="6005"></path><path d="M366.744243 350.289991c-3.542686 0-7.143701-0.779759-10.54517-2.427282-12.008498-5.832845-17.027815-20.298302-11.206226-32.313963 6.578836-13.785981 19.850094-55.063083 2.208295-79.328743-39.947827-54.920844-1.937119-110.85783-0.295735-113.207341 7.628748-10.975982 22.683628-13.674441 33.665751-6.039553 10.910491 7.592932 13.638625 22.565948 6.14086 33.512255-2.149966 3.212158-19.554358 30.956036-0.402159 57.288774 38.377052 52.760644 3.696182 125.795031 2.208295 128.877229C384.33897 345.270674 375.718639 350.289991 366.744243 350.289991z" p-id="6006"></path><path d="M487.66322 350.289991c-3.543709 0-7.144724-0.779759-10.54517-2.427282-12.009522-5.832845-17.028838-20.298302-11.208273-32.313963 6.578836-13.785981 19.85214-55.063083 2.208295-79.328743-39.946804-54.920844-1.937119-110.85783-0.294712-113.207341 7.617491-10.975982 22.684652-13.674441 33.665751-6.039553 10.911514 7.592932 13.638625 22.565948 6.14086 33.512255-2.15099 3.212158-19.555381 30.956036-0.402159 57.288774 38.377052 52.760644 3.696182 125.795031 2.208295 128.877229C505.2559 345.270674 496.635569 350.289991 487.66322 350.289991z" p-id="6007"></path></svg><span class="menu-item-name">生活</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/programming/"><svg t="1625905451012" class="icon technology" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3789" width="128" height="128"><path d="M928 928h-832v-832h832v832z m-85.504-538.048H181.504v449.728h660.8l0.192-449.728z m0-88.32V184.32H181.504v117.312h660.992z m-499.392 456.32l-60.48-62.464L387.072 587.52 282.624 479.68l60.48-62.464 164.928 170.368-164.928 170.368z m412.736-84.992v90.048H576.192v-90.048h179.648z" fill="#333333" p-id="3790"></path></svg><span class="menu-item-name">编程</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href=""><svg t="1625905580672" class="icon book" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1209" width="128" height="128"><path d="M973.142857 273.142857q22.857143 32.571429 10.285714 73.714286l-157.142857 517.714286q-10.857143 36.571429-43.714286 61.428571t-70 24.857143l-527.428571 0q-44 0-84.857143-30.571429t-56.857143-75.142857q-13.714286-38.285714-1.142857-72.571429 0-2.285714 1.714286-15.428571t2.285714-21.142857q0.571429-4.571429-1.714286-12.285714t-1.714286-11.142857q1.142857-6.285714 4.571429-12t9.428571-13.428571 9.428571-13.428571q13.142857-21.714286 25.714286-52.285714t17.142857-52.285714q1.714286-5.714286 2.857143-17.142857t2.857143-16q1.714286-6.285714 9.714286-16t9.714286-13.142857q12-20.571429 24-52.571429t14.285714-51.428571q0.571429-5.142857-1.428571-18.285714t2.857143-16q2.285714-7.428571 12.571429-17.428571t12.571429-12.857143q10.857143-14.857143 24.285714-48.285714t15.714286-55.142857q0.571429-4.571429-1.714286-14.571429t-1.142857-15.142857q1.142857-4.571429 5.142857-10.285714t10.285714-13.142857 9.714286-12q4.571429-6.857143 9.428571-17.428571t8.571429-20 9.142857-20.571429 11.142857-18.285714 15.142857-13.428571 20.571429-6.571429 27.142857 3.142857l-0.571429 1.714286q21.714286-5.142857 29.142857-5.142857l434.857143 0q42.285714 0 65.142857 32t10.285714 74.285714l-156.571429 517.714286q-20.571429 68-40.857143 87.714286t-73.428571 19.714286l-496.571429 0q-15.428571 0-21.714286 8.571429-6.285714 9.142857-0.571429 24.571429 13.714286 40 82.285714 40l527.428571 0q16.571429 0 32-8.857143t20-23.714286l171.428571-564q4-12.571429 2.857143-32.571429 21.714286 8.571429 33.714286 24.571429zm-608 1.142857q-2.285714 7.428571 1.142857 12.857143t11.428571 5.428571l347.428571 0q7.428571 0 14.571429-5.428571t9.428571-12.857143l12-36.571429q2.285714-7.428571-1.142857-12.857143t-11.428571-5.428571l-347.428571 0q-7.428571 0-14.571429 5.428571t-9.428571 12.857143zm-47.428571 146.285714q-2.285714 7.428571 1.142857 12.857143t11.428571 5.428571l347.428571 0q7.428571 0 14.571429-5.428571t9.428571-12.857143l12-36.571429q2.285714-7.428571-1.142857-12.857143t-11.428571-5.428571l-347.428571 0q-7.428571 0-14.571429 5.428571t-9.428571 12.857143z" p-id="1210"></path></svg><span class="menu-item-name">读书</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="programming" data-toc-num="true">
+
+            <h1 class="post-title p-name">使用Python添加PNG图片隐藏块(隐写字符串)</h1>
+
+            
+
+            
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2021-07-22T22:26:35&#43;08:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2021-07-22</time>
+    
+    
+    
+    
+        
+        
+            
+            
+                
+                
+                
+                
+                    
+                    
+                    
+                        
+                            
+                            
+                        
+                    
+                
+            
+            
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/programming/" class="category-link p-category">Programming</a></span>
+            
+        
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;1535</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;4&nbsp;</span>
+    
+    
+    
+</div>
+
+            
+
+            <div class="post-body e-content">
+                <p>最近想批量给PNG图片添加一些隐藏标识，所以google一番，这里记录一下。</p>
+<p>首先是了解PNG文件格式结构<a href="#refer-anchor"><sup>1</sup></a>，PNG数据块Chunk主要是有<code>IHDR</code>、<code>IDAT</code>和<code>IEND</code>组成(缺一不可)</p>
+<p>本篇的主角<code>tEXt</code>和<code>zTXt</code>数据块：
+- <code>tEXt</code>: 文本信息数据块 [可选] 所在PNG文件结构的位置无限制
+- <code>zTXt</code>: 压缩文本数据块 [可选] 所在PNG文件结构的位置无限制</p>
+<p>由于是只处理PNG图片，这里用到是<code>PyPNG</code>模块，该项目Github可访问<a href="https://github.com/drj11/pypng" target="_blank" rel="noopener">drj11/pypng</a></p>
+<p>这里使用下面这张图片来测试
+<img src="images/ivan-rudoy-Ot90TwQGAeE-unsplash.png" alt="ivan-rudoy-Ot90TwQGAeE-unsplash"></p>
+<p>使用的代码如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">zlib</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">random</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">binascii</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">png</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">add_text</span><span class="p">(</span><span class="n">src_img_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dest_img_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">contents</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">is_compress</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">reader</span> <span class="o">=</span> <span class="n">png</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">src_img_path</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 返回图片chunks迭代器并转化为列表</span>
+</span></span><span class="line"><span class="cl">    <span class="n">chunks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">chunks</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 将其转化为bytes</span>
+</span></span><span class="line"><span class="cl">        <span class="n">content</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">is_compress</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">add_chunk</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="sa">b</span><span class="s1">&#39;zTXt&#39;</span><span class="p">,</span> <span class="n">zlib</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">content</span><span class="p">)])</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">add_chunk</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="sa">b</span><span class="s1">&#39;tEXt&#39;</span><span class="p">,</span> <span class="n">content</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1"># PNG格式中chunk的第一个(IHDR)和最后一个(IEND)固定，所以我们可以随机生成一个索引</span>
+</span></span><span class="line"><span class="cl">        <span class="n">chunks</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">add_chunk</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dest_img_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dest_file</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">png</span><span class="o">.</span><span class="n">write_chunks</span><span class="p">(</span><span class="n">dest_file</span><span class="p">,</span> <span class="n">chunks</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">cat_text</span><span class="p">(</span><span class="n">src_img</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">reader</span> <span class="o">=</span> <span class="n">png</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="n">src_img</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">chunks</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">chunks</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;zTXt&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">i</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">zlib</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;tEXt&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">i</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">j</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">src_img_path</span> <span class="o">=</span> <span class="s2">&#34;./test1.png&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dest_img_path</span> <span class="o">=</span> <span class="s2">&#34;./test1_res.png&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 需要隐写的内容</span>
+</span></span><span class="line"><span class="cl">    <span class="n">content</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;This is a test1 content&#34;</span><span class="p">,</span> <span class="s2">&#34;This is a test2 content&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">add_text</span><span class="p">(</span><span class="n">src_img_path</span><span class="p">,</span> <span class="n">dest_img_path</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 如需要查看PNG图片中是否含有`tEXt`和`zTXt`文本相关的数据块</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># cat_text(dest_img_path)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">main</span><span class="p">()</span>
+</span></span></code></pre></div><h4 id="简单展示下text和ztxt数据块在png文件里的区别"><a href="#简单展示下text和ztxt数据块在png文件里的区别" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a>简单展示下<code>tEXt</code>和<code>zTXt</code>数据块在PNG文件里的区别</h4>
+<ul>
+<li>tEXt
+<ol>
+<li>使用<code>tEXt</code>，hexdump隐写后的PNG图片<code>hexdump -C test1_res.png &gt; /var/tmp/11</code></li>
+<li>查询关键字<code>tEXt</code>，使用命令<code>grep -C5 &quot;tEXt&quot; /var/tmp/11</code>，如下输出：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">000cffb0  f5 c3 af 5f <span class="m">35</span> <span class="m">83</span> <span class="m">75</span> c5  2b 1e f7 5d 5f d6 c4 <span class="m">47</span>  <span class="p">|</span>..._5.u.+..<span class="o">]</span>_..G<span class="p">|</span>
+</span></span><span class="line"><span class="cl">000cffc0  5f 3c 2d <span class="m">75</span> cb f7 d0 <span class="m">07</span>  df e6 d3 2e f6 <span class="m">04</span> da e5  <span class="p">|</span>_&lt;-u............<span class="p">|</span>
+</span></span><span class="line"><span class="cl">000cffd0  <span class="m">84</span> f6 bb 9c <span class="m">62</span> 7c b8 <span class="nb">cd</span>  ed <span class="m">11</span> <span class="m">88</span> 2d f4 fd <span class="m">55</span> dd  <span class="p">|</span>....b<span class="p">|</span>.....-..U.<span class="p">|</span>
+</span></span><span class="line"><span class="cl">000cffe0  af b0 f9 d5 a8 a7 ae <span class="m">91</span>  7b <span class="m">81</span> 6e <span class="m">73</span> 3d e4 ab ef  <span class="p">|</span>........<span class="o">{</span>.ns<span class="o">=</span>...<span class="p">|</span>
+</span></span><span class="line"><span class="cl">000cfff0  d0 7e d0 e2 6b cf ec 1b  ec 1a e4 ef <span class="m">35</span> <span class="m">59</span> 0e 5e  <span class="p">|</span>.~..k.......5Y.^<span class="p">|</span>
+</span></span><span class="line"><span class="cl">000d0000  b7 <span class="m">04</span> f0 6f <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">17</span>  <span class="m">74</span> <span class="m">45</span> <span class="m">58</span> <span class="m">74</span> <span class="m">54</span> <span class="m">68</span> <span class="m">69</span> <span class="m">73</span>  <span class="p">|</span>...o....tEXtThis<span class="p">|</span>
+</span></span><span class="line"><span class="cl">000d0010  <span class="m">20</span> <span class="m">69</span> <span class="m">73</span> <span class="m">20</span> <span class="m">61</span> <span class="m">20</span> <span class="m">74</span> <span class="m">65</span>  <span class="m">73</span> <span class="m">74</span> <span class="m">31</span> <span class="m">20</span> <span class="m">63</span> 6f 6e <span class="m">74</span>  <span class="p">|</span> is a test1 cont<span class="p">|</span>
+</span></span><span class="line"><span class="cl">000d0020  <span class="m">65</span> 6e <span class="m">74</span> ab ab <span class="m">44</span> d9 <span class="m">00</span>  <span class="m">00</span> ff f4 <span class="m">49</span> <span class="m">44</span> <span class="m">41</span> <span class="m">54</span> d8  <span class="p">|</span>ent..D.....IDAT.<span class="p">|</span>
+</span></span><span class="line"><span class="cl">000d0030  b8 3d <span class="m">59</span> 6c 5f 9b af <span class="m">46</span>  fe e6 ef 6a <span class="m">15</span> 5b <span class="m">14</span> <span class="m">93</span>  <span class="p">|</span>.<span class="o">=</span>Yl_..F...j.<span class="o">[</span>..<span class="p">|</span>
+</span></span><span class="line"><span class="cl">000d0040  b3 f9 8d 6a ae 2f <span class="nb">cd</span> <span class="m">46</span>  5a <span class="nb">cd</span> db bb d0 1c f7 ac  <span class="p">|</span>...j./.FZ.......<span class="p">|</span>
+</span></span><span class="line"><span class="cl">000d0050  ff <span class="m">14</span> 6b 5e bc 3d b5 7f  ae <span class="m">81</span> 3d 2d 5e ad <span class="nb">fc</span> d5  <span class="p">|</span>..k^.<span class="o">=</span>....<span class="o">=</span>-^...<span class="p">|</span>
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">003effd0  <span class="m">49</span> <span class="nb">fc</span> fe e7 9f c6 3f fe  f2 f3 f8 dd 2f 3e 8b af  <span class="p">|</span>I.....?...../&gt;..<span class="p">|</span>
+</span></span><span class="line"><span class="cl">003effe0  3f bf <span class="m">13</span> 5f 3d f8 <span class="m">38</span> 7e  fd 8b 6f e3 <span class="m">97</span> bf f8 2e  <span class="p">|</span>?.._<span class="o">=</span>.8~..o.....<span class="p">|</span>
+</span></span><span class="line"><span class="cl">003efff0  7e fe f3 ef e3 <span class="m">57</span> bf fa  <span class="m">45</span> <span class="nb">fc</span> fd df ff <span class="m">36</span> 7e fd  <span class="p">|</span>~....W..E....6~.<span class="p">|</span>
+</span></span><span class="line"><span class="cl">003f0000  db 5f c5 <span class="m">27</span> 5f 7d 1e af  df ba 1d <span class="m">67</span> df b8 <span class="m">11</span> e7  <span class="p">|</span>._.<span class="s1">&#39;_}.....g....|
+</span></span></span><span class="line"><span class="cl"><span class="s1">003f0010  df b9 1b 27 ae 7f 1a 07  41 73 3f 2f cf d0 fc 23  |...&#39;</span>....As?/...#<span class="p">|</span>
+</span></span><span class="line"><span class="cl">003f0020  8c e6 9e <span class="m">74</span> <span class="m">24</span> de ce <span class="m">00</span>  <span class="m">00</span> <span class="m">00</span> <span class="m">17</span> <span class="m">74</span> <span class="m">45</span> <span class="m">58</span> <span class="m">74</span> <span class="m">54</span>  <span class="p">|</span>...t$......tEXtT<span class="p">|</span>
+</span></span><span class="line"><span class="cl">003f0030  <span class="m">68</span> <span class="m">69</span> <span class="m">73</span> <span class="m">20</span> <span class="m">69</span> <span class="m">73</span> <span class="m">20</span> <span class="m">61</span>  <span class="m">20</span> <span class="m">74</span> <span class="m">65</span> <span class="m">73</span> <span class="m">74</span> <span class="m">32</span> <span class="m">20</span> <span class="m">63</span>  <span class="p">|</span>his is a test2 c<span class="p">|</span>
+</span></span><span class="line"><span class="cl">003f0040  6f 6e <span class="m">74</span> <span class="m">65</span> 6e <span class="m">74</span> <span class="m">92</span> <span class="m">26</span>  <span class="m">78</span> 1c <span class="m">00</span> <span class="m">00</span> ff f4 <span class="m">49</span> <span class="m">44</span>  <span class="p">|</span>ontent.<span class="p">&amp;</span>x.....ID<span class="p">|</span>
+</span></span><span class="line"><span class="cl">003f0050  <span class="m">41</span> <span class="m">54</span> b1 e7 3a cf 5f <span class="nb">cd</span>  3d e3 dd <span class="m">66</span> dc dc f7 <span class="m">24</span>  <span class="p">|</span>AT..:._.<span class="o">=</span>..f...$<span class="p">|</span>
+</span></span><span class="line"><span class="cl">003f0060  <span class="m">66</span> f1 <span class="nb">fc</span> <span class="m">27</span> <span class="m">31</span> cb ef <span class="m">74</span>  8c b9 <span class="m">17</span> <span class="m">15</span> <span class="m">02</span> <span class="m">57</span> <span class="m">73</span> df  <span class="p">|</span>f..<span class="err">&#39;</span>1..t.....Ws.<span class="p">|</span>
+</span></span><span class="line"><span class="cl">003f0070  3f 7c f3 <span class="m">41</span> c1 be eb f7  7a f7 <span class="m">53</span> f4 c4 f5 9e c7  <span class="p">|</span>?<span class="p">|</span>.A....z.S.....<span class="p">|</span>
+</span></span></code></pre></div><ol start="3">
+<li>如上输出隐写后的<code>tEXt</code>的数据<code>&quot;This is a test1 content&quot;, &quot;This is a test2 content&quot;</code>相关字符串为<strong>明文</strong></li>
+</ol>
+</li>
+<li>zTXt
+<ol>
+<li>使用<code>zTXt</code>，步骤上1</li>
+<li>查找关键字<code>zTXt</code>，命令<code>grep -C5 &quot;zTXt&quot; /var/tmp/11</code></li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0020ffb0  bf 7c 6e d3 2f de 5a 9c  <span class="m">97</span> <span class="nb">fc</span> 5f e7 <span class="nb">fc</span> <span class="m">36</span> be 5f  <span class="p">|</span>.<span class="p">|</span>n./.Z..._..6._<span class="p">|</span>
+</span></span><span class="line"><span class="cl">0020ffc0  cc fa e0 7e bf ac <span class="m">13</span> 3e  f5 be f3 8a 7f f6 <span class="m">67</span> 8d  <span class="p">|</span>...~...&gt;......g.<span class="p">|</span>
+</span></span><span class="line"><span class="cl">0020ffd0  d9 fd <span class="m">19</span> b2 <span class="m">35</span> ad <span class="m">15</span> df  d9 df <span class="m">33</span> cf d7 c5 <span class="m">80</span> fb  <span class="p">|</span>....5.....3.....<span class="p">|</span>
+</span></span><span class="line"><span class="cl">0020ffe0  7d f2 ca f9 ac <span class="m">03</span> 8f ba  9f c8 9f af <span class="m">31</span> 2d 7c f3  <span class="p">|</span><span class="o">}</span>...........1-<span class="p">|</span>.<span class="p">|</span>
+</span></span><span class="line"><span class="cl">0020fff0  9e f1 fd ec 2d 8a df e7  ef e2 fb 0f 9a 3e ed e6  <span class="p">|</span>....-........&gt;..<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00210000</span>  <span class="m">36</span> <span class="m">49</span> <span class="m">35</span> a0 <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 1d  7a <span class="m">54</span> <span class="m">58</span> <span class="m">74</span> <span class="m">78</span> 9c 0b c9  <span class="p">|</span>6I5.....zTXtx...<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00210010</span>  c8 2c <span class="m">56</span> <span class="m">00</span> a2 <span class="m">44</span> <span class="m">85</span> <span class="m">92</span>  d4 e2 <span class="m">12</span> <span class="m">23</span> <span class="m">85</span> e4 <span class="nb">fc</span> bc  <span class="p">|</span>.,V..D.....#....<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00210020</span>  <span class="m">92</span> d4 bc <span class="m">12</span> <span class="m">00</span> 5f 9f <span class="m">08</span>  <span class="m">43</span> <span class="m">26</span> <span class="m">51</span> <span class="m">68</span> b8 <span class="m">00</span> <span class="m">00</span> ff  <span class="p">|</span>....._..C<span class="p">&amp;</span>Qh....<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00210030</span>  f4 <span class="m">49</span> <span class="m">44</span> <span class="m">41</span> <span class="m">54</span> 7c a1 1f  ac 2d fa <span class="m">61</span> e0 c2 3f <span class="m">30</span>  <span class="p">|</span>.IDAT<span class="p">|</span>...-.a..?0<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00210040</span>  fb <span class="m">21</span> e1 fe <span class="m">80</span> a9 1f <span class="m">28</span>  5d fe <span class="m">85</span> 1f 6e 3d f9 f8  <span class="p">|</span>.!.....<span class="o">(]</span>...n<span class="o">=</span>..<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00210050</span>  d7 5e 7c 8b 7d ac f3 <span class="m">03</span>  4f <span class="m">17</span> b3 5e e7 fd <span class="m">89</span> f6  <span class="p">|</span>.^<span class="p">|</span>.<span class="o">}</span>...O..^....<span class="p">|</span>
+</span></span><span class="line"><span class="cl">--
+</span></span><span class="line"><span class="cl">004fffe0  5f 1c <span class="m">92</span> c2 0f e0 1a af  <span class="m">46</span> d1 9a <span class="m">40</span> c7 f8 a9 c3  <span class="p">|</span>_.......F..@....<span class="p">|</span>
+</span></span><span class="line"><span class="cl">004ffff0  <span class="m">39</span> <span class="m">18</span> 5f ae 7d ec f8 e5  aa 4d 2b d4 <span class="m">28</span> 5c <span class="m">33</span> d7  <span class="p">|</span>9._.<span class="o">}</span>....M+.<span class="o">(</span><span class="se">\3</span>.<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00500000</span>  d6 eb a2 <span class="nb">cd</span> 7b <span class="m">10</span> 1e eb  cc <span class="m">98</span> 7e ff dd <span class="m">51</span> <span class="m">43</span> <span class="m">68</span>  <span class="p">|</span>....<span class="o">{</span>.....~..QCh<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00500010</span>  f3 fe <span class="m">13</span> bd <span class="m">66</span> d3 <span class="m">86</span> ae  3e <span class="m">75</span> ec d3 ee d7 <span class="m">74</span> <span class="m">83</span>  <span class="p">|</span>....f...&gt;u....t.<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00500020</span>  b6 7b de ac <span class="m">95</span> <span class="m">73</span> <span class="m">76</span> ec  <span class="m">35</span> <span class="m">18</span> <span class="m">30</span> 5f b4 <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  <span class="p">|</span>.<span class="o">{</span>...sv.5.0_....<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00500030</span>  1d 7a <span class="m">54</span> <span class="m">58</span> <span class="m">74</span> <span class="m">78</span> 9c 0b  c9 c8 2c <span class="m">56</span> <span class="m">00</span> a2 <span class="m">44</span> <span class="m">85</span>  <span class="p">|</span>.zTXtx....,V..D.<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00500040</span>  <span class="m">92</span> d4 e2 <span class="m">12</span> <span class="m">43</span> <span class="m">85</span> e4 <span class="nb">fc</span>  bc <span class="m">92</span> d4 bc <span class="m">12</span> <span class="m">00</span> 5f <span class="m">96</span>  <span class="p">|</span>....C........._.<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00500050</span>  <span class="m">08</span> <span class="m">42</span> d2 5a ec <span class="m">88</span> <span class="m">00</span> <span class="m">00</span>  ff f4 <span class="m">49</span> <span class="m">44</span> <span class="m">41</span> <span class="m">54</span> <span class="m">14</span> ae  <span class="p">|</span>.B.Z......IDAT..<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00500060</span>  <span class="m">15</span> <span class="m">80</span> b7 af 4f 6a 6a 5e  d7 a7 eb af <span class="m">06</span> <span class="m">71</span> de <span class="m">37</span>  <span class="p">|</span>....Ojj^.....q.7<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00500070</span>  f2 <span class="m">85</span> 1a ce 7f e6 <span class="m">76</span> 5c  db <span class="m">84</span> b5 ed f5 2d f8 d3  <span class="p">|</span>......v<span class="se">\.</span>....-..<span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="m">00500080</span>  <span class="m">46</span> 6b ad ab 7b f7 0a be  <span class="m">27</span> 7a <span class="m">73</span> d8 <span class="m">21</span> e8 c1 <span class="m">18</span>  <span class="p">|</span>Fk..<span class="o">{</span>...<span class="err">&#39;</span>zs.!...<span class="p">|</span>
+</span></span></code></pre></div><ol start="3">
+<li>如上输出隐写后的<code>zTXt</code>的数据<code>&quot;This is a test1 content&quot;, &quot;This is a test2 content&quot;</code>相关字符串为<strong>密文</strong></li>
+</ol>
+</li>
+</ul>
+<div id="refer-anchor"></div>
+<h4 id="参考文章"><a href="#参考文章" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a>参考文章：</h4>
+<p>[1] <a href="https://blog.csdn.net/hherima/article/details/45846901" target="_blank" rel="noopener">PNG文件格式</a></p>
+<p>[2] <a href="https://pypng.readthedocs.io/en/latest/" target="_blank" rel="noopener">PyPNG documentation</a></p>
+<p>Enjoy.</p>
+
+            </div>
+
+            
+    
+    
+
+
+
+        </article>
+
+        
+
+        
+
+
+        
+
+
+        <div class="post-share">
+
+        
+            <div class="share-text"></div>
+        
+
+        <div class="share-items">
+
+            
+            
+                
+                    <div class="share-item facebook">
+                        
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=http://172.21.155.100:1313/programming/add_png_chunks_with_python/&amp;hashtag=%23%e7%bc%96%e7%a8%8b" title="" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon facebook-icon"><path d="M504 256C504 119 393 8 256 8S8 119 8 256c0 123.78 90.69 226.38 209.25 245V327.69h-63V256h63v-54.64c0-62.15 37-96.48 93.67-96.48 27.14 0 55.52 4.84 55.52 4.84v61h-31.28c-30.8 0-40.41 19.12-40.41 38.73V256h68.78l-11 71.69h-57.78V501C413.31 482.38 504 379.78 504 256z"/></svg></a>
+                    </div>
+                
+            
+                
+                    <div class="share-item mastodon">
+                            <a href="/fedishare.html#title=%e4%bd%bf%e7%94%a8Python%e6%b7%bb%e5%8a%a0PNG%e5%9b%be%e7%89%87%e9%9a%90%e8%97%8f%e5%9d%97%28%e9%9a%90%e5%86%99%e5%ad%97%e7%ac%a6%e4%b8%b2%29&amp;description=%e6%9c%80%e8%bf%91%e6%83%b3%e6%89%b9%e9%87%8f%e7%bb%99PNG%e5%9b%be%e7%89%87%e6%b7%bb%e5%8a%a0%e4%b8%80%e4%ba%9b%e9%9a%90%e8%97%8f%e6%a0%87%e8%af%86%ef%bc%8c%e6%89%80%e4%bb%a5google%e4%b8%80%e7%95%aa%ef%bc%8c%e8%bf%99%e9%87%8c%e8%ae%b0%e5%bd%95%e4%b8%80%e4%b8%8b%e3%80%82%0a%e9%a6%96%e5%85%88%e6%98%af%e4%ba%86%e8%a7%a3PNG%e6%96%87%e4%bb%b6%e6%a0%bc%e5%bc%8f%e7%bb%93%e6%9e%841%ef%bc%8cPNG%e6%95%b0%e6%8d%ae%e5%9d%97Chunk%e4%b8%bb%e8%a6%81%e6%98%af%e6%9c%89IHDR%e3%80%81IDAT%e5%92%8cIEND%e7%bb%84%e6%88%90%28%e7%bc%ba%e4%b8%80%e4%b8%8d%e5%8f%af%29%0a%e6%9c%ac%e7%af%87%e7%9a%84%e4%b8%bb%e8%a7%92tEXt%e5%92%8czTXt%e6%95%b0%e6%8d%ae%e5%9d%97%ef%bc%9a%20-%20tEXt:%20%e6%96%87%e6%9c%ac%e4%bf%a1%e6%81%af%e6%95%b0%e6%8d%ae%e5%9d%97%20[%e5%8f%af%e9%80%89]%20%e6%89%80%e5%9c%a8PNG%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84%e7%9a%84%e4%bd%8d%e7%bd%ae%e6%97%a0%e9%99%90%e5%88%b6%20-%20zTXt:%20%e5%8e%8b%e7%bc%a9%e6%96%87%e6%9c%ac%e6%95%b0%e6%8d%ae%e5%9d%97%20[%e5%8f%af%e9%80%89]%20%e6%89%80%e5%9c%a8PNG%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84%e7%9a%84%e4%bd%8d%e7%bd%ae%e6%97%a0%e9%99%90%e5%88%b6%0a&amp;url=http://172.21.155.100:1313/programming/add_png_chunks_with_python/" title="" target="_blank" rel="noopener"></a>
+                        </div>
+                    
+            
+                
+                    <div class="share-item fediverse">
+                            <a href="/fedishare.html#title=%e4%bd%bf%e7%94%a8Python%e6%b7%bb%e5%8a%a0PNG%e5%9b%be%e7%89%87%e9%9a%90%e8%97%8f%e5%9d%97%28%e9%9a%90%e5%86%99%e5%ad%97%e7%ac%a6%e4%b8%b2%29&amp;description=%e6%9c%80%e8%bf%91%e6%83%b3%e6%89%b9%e9%87%8f%e7%bb%99PNG%e5%9b%be%e7%89%87%e6%b7%bb%e5%8a%a0%e4%b8%80%e4%ba%9b%e9%9a%90%e8%97%8f%e6%a0%87%e8%af%86%ef%bc%8c%e6%89%80%e4%bb%a5google%e4%b8%80%e7%95%aa%ef%bc%8c%e8%bf%99%e9%87%8c%e8%ae%b0%e5%bd%95%e4%b8%80%e4%b8%8b%e3%80%82%0a%e9%a6%96%e5%85%88%e6%98%af%e4%ba%86%e8%a7%a3PNG%e6%96%87%e4%bb%b6%e6%a0%bc%e5%bc%8f%e7%bb%93%e6%9e%841%ef%bc%8cPNG%e6%95%b0%e6%8d%ae%e5%9d%97Chunk%e4%b8%bb%e8%a6%81%e6%98%af%e6%9c%89IHDR%e3%80%81IDAT%e5%92%8cIEND%e7%bb%84%e6%88%90%28%e7%bc%ba%e4%b8%80%e4%b8%8d%e5%8f%af%29%0a%e6%9c%ac%e7%af%87%e7%9a%84%e4%b8%bb%e8%a7%92tEXt%e5%92%8czTXt%e6%95%b0%e6%8d%ae%e5%9d%97%ef%bc%9a%20-%20tEXt:%20%e6%96%87%e6%9c%ac%e4%bf%a1%e6%81%af%e6%95%b0%e6%8d%ae%e5%9d%97%20[%e5%8f%af%e9%80%89]%20%e6%89%80%e5%9c%a8PNG%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84%e7%9a%84%e4%bd%8d%e7%bd%ae%e6%97%a0%e9%99%90%e5%88%b6%20-%20zTXt:%20%e5%8e%8b%e7%bc%a9%e6%96%87%e6%9c%ac%e6%95%b0%e6%8d%ae%e5%9d%97%20[%e5%8f%af%e9%80%89]%20%e6%89%80%e5%9c%a8PNG%e6%96%87%e4%bb%b6%e7%bb%93%e6%9e%84%e7%9a%84%e4%bd%8d%e7%bd%ae%e6%97%a0%e9%99%90%e5%88%b6%0a&amp;url=http://172.21.155.100:1313/programming/add_png_chunks_with_python/" title="" target="_blank" rel="noopener"></a>
+                        </div>
+                    
+            
+                
+                    <div class="share-item twitter">
+                        
+                        <a href="https://twitter.com/share?url=http://172.21.155.100:1313/programming/add_png_chunks_with_python/&amp;text=%e4%bd%bf%e7%94%a8Python%e6%b7%bb%e5%8a%a0PNG%e5%9b%be%e7%89%87%e9%9a%90%e8%97%8f%e5%9d%97%28%e9%9a%90%e5%86%99%e5%ad%97%e7%ac%a6%e4%b8%b2%29&amp;hashtags=%e7%bc%96%e7%a8%8b,Python,Steganography,%e9%9a%90%e5%86%99,&amp;via=icheontao" title="" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon twitter-icon"><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg></a>
+                    </div>
+                
+            
+        </div>
+
+    </div>
+
+
+
+
+        
+
+
+        
+
+
+        
+    <footer class="minimal-footer">
+        
+            <div class="post-tag"><a href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag" class="post-tag-link">#编程</a> <a href="/tags/python/" rel="tag" class="post-tag-link">#python</a> <a href="/tags/steganography/" rel="tag" class="post-tag-link">#steganography</a> <a href="/tags/%E9%9A%90%E5%86%99/" rel="tag" class="post-tag-link">#隐写</a></div>
+        
+        
+            <div class="post-category">
+                <a href="/programming/" class="post-category-link active">programming</a> |  | 
+            </div>
+        
+        
+    </footer>
+
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/programming/arithmetic_expression/" rel="prev">&lt; 算术表达式</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/programming/use-github-actions-building-hugo-blog/" rel="next">使用Github Actions自动构建Hugo个人博客 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2021–2024</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    let imgNodes = document.querySelectorAll('div.post-body img');
+    imgNodes = Array.from(imgNodes).filter(node => node.parentNode.tagName !== "A");
+
+    mediumZoom(imgNodes, {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+    
+
+
+
+
+    </body>
+</html>

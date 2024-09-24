@@ -6,7 +6,7 @@ title = "Icheon Tao's Blog"
 languageCode = "zh-CN"
 hasCJKLanguage = true
 # 版权信息（支持 Markdown）
-copyright = "本文在保留作者及链接的前提下，非商业用途随意转载分享。"
+copyright = "本文在保留作者及链接的前提下，非商业用途随意转载分享。[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans)"
 
 # 主题选择
 theme = "meme"
@@ -36,9 +36,6 @@ enableGitInfo = true
 # 是否生成 robots.txt 文件
 enableRobotsTXT = false
 
-# 每一分页的文章数（仅对「文章摘要」首页布局有效）
-paginate = 5
-
 # URL 相关
 disablePathToLower = false
 relativeURLs = false
@@ -46,15 +43,23 @@ uglyURLs = false
 
 # URL 结构
 [permalinks]
+    categories = "/categories/:slug/"
     tags = "/tags/:slug/"
 
 # 类别
 [taxonomies]
+    categories = "categories"
     tag = "tags"
 
 # 修改时间
 [frontmatter]
     lastmod = ["lastmod", ":git", ":fileModTime", ":default"]
+
+[pagination]
+    disableAliases = false
+    # 每一分页的文章数（仅对「文章摘要」首页布局有效）
+    pagerSize = 5
+    path = 'page'
 
 # Markdown 渲染器
 [markup]
@@ -155,7 +160,7 @@ uglyURLs = false
 
 # RSS & Atom 文章数限制
 [services.rss]
-    limit = -1
+    limit = 5
 
 
 
@@ -184,34 +189,34 @@ uglyURLs = false
 [menu]
     ## 菜单栏
     [[menu.main]]
-        url = "/life/"
+        pageref = "/life/"
         name = "生活"
         weight = 1
         pre = "internal"
         post = "life"
         identifier = "life"
     [[menu.main]]
-        url = "/programming/"
+        pageref = "/programming/"
         name = "编程"
         weight = 2
         pre = "internal"
         post = "program"
         identifier = "technology"
     [[menu.main]]
-        url = "/book/"
+        pageref = "/book/"
         name = "读书"
         weight = 3
         pre = "internal"
         post = "book"
         identifier = "book"
     [[menu.main]]
-        url = "/tags/"
+        pageref = "/tags/"
         name = "标签"
         weight = 4
         pre = "internal"
         post = "tags"
     [[menu.main]]
-        url = "/about/"
+        pageref = "/about/"
         name = "关于"
         weight = 5
         pre = "internal"
@@ -219,13 +224,13 @@ uglyURLs = false
     [[menu.main]]
         weight = 6
         identifier = "theme-switcher"
-    # [[menu.main]]
-    #     weight = 7
-    #     identifier = "lang-switcher"
-    # [[menu.main]]
-    #     weight = 8
-    #     identifier = "search"
-    #     post = "search"
+    [[menu.main]]
+        weight = 7
+        identifier = "lang-switcher"
+    [[menu.main]]
+        weight = 8
+        identifier = "search"
+        post = "search"
 
 ##########################################
 # 主题配置
@@ -256,7 +261,7 @@ uglyURLs = false
     # 在窄视图下隐藏菜单栏并显示一个按钮？
     enableNavToggle = true
 
-    navHeight = "10em"
+    navHeight = "12em"
     # 说明：菜单栏展开时的高度
 
 
@@ -632,12 +637,12 @@ uglyURLs = false
     # 说明：https://utteranc.es/
 
     ## Gitalk
-    enableGitalk = false
-    gitalkClientID = "your_client_id"
-    gitalkClientSecret = "your_client_secret"
-    gitalkRepo = "your_repository"
-    gitalkOwner = "your_gitalk_owner"
-    gitalkAdmin = ["your_gitalk_admin"]
+    enableGitalk = true
+    gitalkClientID = "Ov23lihviuZNEcZxG2cF"
+    gitalkClientSecret = "1d2b9c049d7eb88188798c46a838957c2728039d"
+    gitalkRepo = "10001001.xyz"
+    gitalkOwner = "10001001.xyz"
+    gitalkAdmin = ["icheontao"]
     gitalkLable = ["Gitalk"]
     gitalkDistractionFreeMode = false
     gitalkPerPage = 10
@@ -645,6 +650,10 @@ uglyURLs = false
     gitalkPagerDirection = "last"
     gitalkCreateIssueManually = false
     gitalkProxy = "https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"
+    gitalkStaggerDelayBy = 150
+    gitalkAppearAnimation = "accordionVertical"
+    gitalkEnterAnimation = "accordionVertical"
+    gitalkLeaveAnimation = "accordionVertical"
     gitalkEnableHotKey = true
     # 说明：https://github.com/gitalk/gitalk
 
@@ -904,6 +913,9 @@ uglyURLs = false
     #      `---` 以将文章的正文内容与脚注内容
     #      分隔开来，那么这项设置将会非常有用。
 
+    ######################################
+    # 滚动条
+    customizeScrollbar = true
 
     ######################################
     # 字体排版
@@ -1368,3 +1380,35 @@ uglyURLs = false
     fofVideoWebm = ""
     fofVideoMp4 = ""
     # 说明：视频地址可留空（""）
+
+    ######################################
+    # 定制第三方库的地址
+
+[params.lib]
+    host = "https://cdn.jsdelivr.net"
+    # 说明：设置为根（"/"）且将下方对应 path
+    #      设置，如果你想要直接从「本地」
+    #      加载某个库的话。比如：
+    #      将 path 设置为 "js/lib.min.js"，
+    #      并将文件放到你的 /static/js/lib.min.js
+[params.lib.path]
+    clipboard = "/npm/clipboard-polyfill@2.8.6/dist/clipboard-polyfill.min.js"
+    instantsearch = "/npm/instantsearch.js@2/dist/instantsearch.min.js"
+    gitalk = "/npm/gitalk@1/dist/gitalk.min.js"
+    gitalk_css = "/npm/gitalk@1/dist/gitalk.css"
+    instantpage = "/npm/instant.page@5.1.0/instantpage.min.js"
+    katex = "/npm/katex@0.13.0/dist/katex.min.js"
+    katex_css = "/npm/katex@0.13.0/dist/katex.min.css"
+    katex_mhchem = "/npm/katex@0.13.0/dist/contrib/mhchem.min.js"
+    katex_auto_render = "/npm/katex@0.13.0/dist/contrib/auto-render.min.js"
+    lunr = "/npm/lunr@2.3.9/lunr.min.js"
+    lunr_tinyseg = "/npm/lunr-languages@1.4.0/tinyseg.js"
+    lunr_stemmer = "/npm/lunr-languages@1.4.0/min/lunr.stemmer.support.min.js"
+    lunr_lang = "/npm/lunr-languages@1.4.0/min/lunr.de.min.js"
+    mathjax = "/npm/mathjax@3.1.2/es5/tex-mml-chtml.js"
+    medium_zoom = "/npm/medium-zoom@latest/dist/medium-zoom.min.js"
+    mermaid = "/npm/mermaid@8.8.3/dist/mermaid.min.js"
+    qrcode = "/npm/qrcode-generator@1.4.4/qrcode.min.js"
+    valine = "/npm/valine@1.4.14/dist/Valine.min.js"
+    busuanzi = "https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"
+    utterances = "https://utteranc.es/client.js"
