@@ -6,7 +6,7 @@ title = "Icheon Tao's Blog"
 languageCode = "zh-CN"
 hasCJKLanguage = true
 # 版权信息（支持 Markdown）
-copyright = "本文在保留作者及链接的前提下，非商业用途随意转载分享。[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans)"
+copyright = "本文在保留作者及链接的前提下，非商业用途随意转载分享。遵循[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans)"
 
 # 主题选择
 theme = "meme"
